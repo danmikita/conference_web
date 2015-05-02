@@ -4,22 +4,19 @@ import java.util.Collection;
 
 
 import com.ioextendedgr.web.builder.*;
-import com.ioextendedgr.web.data.ConferenceSession;
-import com.ioextendedgr.web.data.Presenter;
+import com.ioextendedgr.web.data.*;
 import com.ioextendedgr.web.repository.*;
 import com.ioextendedgr.web.viewDto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
-import com.ioextendedgr.web.data.Conference;
 import com.ioextendedgr.web.data.ConferenceSession;
 import com.ioextendedgr.web.repository.ConferenceRepository;
 import com.ioextendedgr.web.repository.ConferenceSessionRepository;
 import com.ioextendedgr.web.repository.LocationRepository;
 import com.ioextendedgr.web.repository.PresenterRepository;
 import com.ioextendedgr.web.repository.RoomRepository;
-import com.ioextendedgr.web.data.Location;
 import com.ioextendedgr.web.util.StubFactory;
 
 @Component
@@ -76,7 +73,7 @@ public class ConferenceService {
 
     public void updatePresenter(Presenter inputPresenter){
         Presenter managedPresenter = presenterRepository.findOne(inputPresenter.getId());
-        if(inputPresenter.getCompany() != null){
+        if(inputPresenter.getCompany() != null && inputPresenter.getCompany().getId() != null){
             managedPresenter.setCompany(inputPresenter.getCompany());
         }
         if(inputPresenter.getUserId() != null){
@@ -197,4 +194,31 @@ public class ConferenceService {
 	public RoomView findRoomById(Integer id) {
 		return RoomViewBuilder.build(roomRepository.findOne(id));
 	}
+
+    public void addRoom(Room room){
+        roomRepository.save(room);
+    }
+
+    public void deleteRoom(Integer id){
+        roomRepository.delete(id);
+    }
+
+    public void updateRoom(Room inputRoom){
+        Room managedRoom = roomRepository.findOne(inputRoom.getId());
+
+        if(!Strings.isNullOrEmpty(inputRoom.getShortDesc())){
+            managedRoom.setShortDesc(inputRoom.getShortDesc());
+        }
+        if(!Strings.isNullOrEmpty(inputRoom.getFullDesc())){
+            managedRoom.setFullDesc(inputRoom.getFullDesc());
+        }
+        if(inputRoom.getConference() != null && inputRoom.getConference().getId() != null){
+            Conference conference = new Conference();
+            conference.setId(inputRoom.getConference().getId());
+            managedRoom.setConference(conference);
+        }
+
+        roomRepository.save(managedRoom);
+    }
+    
 }
